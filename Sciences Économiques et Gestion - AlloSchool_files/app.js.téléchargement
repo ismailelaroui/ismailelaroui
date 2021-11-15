@@ -1,0 +1,207 @@
+/*! Project Application js */
+
+// Prevent frame inclusion
+if (window.top !== window.self) {
+    window.top.location.href = window.self.location.href;
+}
+
+//
+$(function () {
+    // Navbar Dropdown
+    window.appMsg = window.appMsg || function (data) {
+        $('.app-snackbar').slideUp(function () {
+            $('.app-snackbar').html(data).slideDown('fast');
+        });
+    };
+    // HTML5 search input clear handle
+    window.appClearSearch = window.appClearSearch || function () {
+        $('.has-clear input[type="text"]').on('input propertychange', function () {
+            var $this = $(this);
+            var visible = Boolean($this.val());
+            $this.siblings('.form-control-clear').toggleClass('hidden', !visible);
+        }).trigger('propertychange');
+        $('.form-control-clear').click(function () {
+            $(this).siblings('input[type="text"]').val('').trigger('propertychange').focus();
+        });
+    };
+    window.appClearSearch();
+    // Add CSS class 's' to animate scroll
+    window.appAnimateScroll = window.appAnimateScroll || function () {
+        $("a.s").on('click', function (event) {
+            if (this.hash !== "") {
+                event.preventDefault();
+                $('.navbar-collapse').collapse('hide');
+                var hash = this.hash;
+                $('html, body').animate({
+                    scrollTop: $(hash).offset().top
+                }, 500, function () {
+                    window.location.hash = hash;
+                });
+            }
+        });
+    };
+    window.appAnimateScroll();
+    // Slide toggle system
+    window.appSlideToggle = window.appSlideToggle || function () {
+        $('body').on('click', '.toggle-anchor', function () {
+            $(this).toggleClass('open').closest('.toggle-wrap').find('.toggle-target').slideToggle();
+        });
+    };
+    window.appSlideToggle();
+
+    // Modal Delete Handler
+    window.appModalDelete = window.appModalDelete || function () {
+        $('body').on('click', 'a.modal-delete', function (e) {
+            e.preventDefault();
+            $('#modal-delete-handler').find('form').attr("action", $(this).attr('href'));
+            $('#modal-delete-handler').modal("show", $(this));
+            return false;
+        });
+        $('body').on('click', 'button.modal-delete', function (e) {
+            e.preventDefault();
+            $('#modal-delete-handler').find('form').attr("action", $(this).attr('data-href'));
+            $('#modal-delete-handler').modal("show", $(this));
+            return false;
+        });
+    };
+    window.appModalDelete();
+    // Ajax Loader
+    window.appAjaxLoad = window.appAjaxLoad || function () {
+        $('body').on('click', '.ajax-trigger', function (e) {
+            e.preventDefault();
+            $(this).find('mdi').removeClass('mdi-plus-circle').addClass('mdi-download');
+            $.get($(this).attr('href'), function (data) {
+                $('.ajax-holder').remove();
+                $('#ajax-content').append($(data).find('#ajax-content').html());
+            });
+            return false;
+        });
+    };
+    window.appAjaxLoad();
+    // Select filter
+    window.appGetFilter = window.appGetFilter || function () {
+        $('body').on('change', 'select.get-filter', function (e) {
+            e.preventDefault();
+            var $divFormFilter = $(this).closest('div.wrap-filter');
+            $.ajax({
+                url: $(this).attr('data-filter'),
+                data: $divFormFilter.find('input,select,textarea').serializeArray(),
+                type: 'GET',
+                complete: function (data) {
+                    $divFormFilter.html(data.responseText || '');
+                }
+            });
+        });
+    };
+    window.appGetFilter();
+    // Audio Player
+    window.appPlayAudio = window.appPlayAudio || function () {
+        $('body').on('click', '.audio-item-trigger', function () {
+            var audioElement = document.createElement('audio');
+            audioElement.setAttribute('src', $(this).find('span.surl').text());
+            audioElement.setAttribute('autoplay', 'autoplay');
+        });
+    };
+    window.appPlayAudio();
+    // Checkbox switch
+    window.appCheckboxSwitch = window.appCheckboxSwitch || function () {
+        // Style 1 : Contrast
+        $('body').on('click', '.cb', function () {
+            if ($(this).find('input.cs-value').length === 0) {
+                return false;
+            }
+            $input = $(this).find('input.cs-value').eq(0);
+            $ico = $(this).find('span.cs-ico');
+            $back = $(this).find('.cb-back');
+            if ($input.val() === "1") {
+                $input.val("0");
+                $ico.removeClass('mdi-check').addClass('mdi-close');
+                $back.removeClass('bg-success').addClass('bg-danger');
+            } else {
+                $input.val("1");
+                $ico.removeClass('mdi-close').addClass('mdi-check');
+                $back.removeClass('bg-danger').addClass('bg-success');
+            }
+        });
+        //
+        $('body').on('click', '.cbq', function () {
+            if ($(this).find('input').length === 0) {
+                return false;
+            }
+            $input = $(this).find('input').eq(0);
+            $ico = $(this).find('.mdi');
+            if ($input.val() === "0") {
+                $input.val("1");
+                $ico.removeClass('mdi-checkbox-blank-outline');
+                $ico.addClass('mdi-checkbox-marked-outline');
+            } else {
+                $input.val("0");
+                $ico.removeClass('mdi-checkbox-marked-outline');
+                $ico.addClass('mdi-checkbox-blank-outline');
+            }
+            //
+            if ($('#single_response').val() === 'Yes') {
+                $('.carousel').carousel('next');
+            }
+        });
+    };
+    window.appCheckboxSwitch();
+    // Lister View switch
+    window.appListerView = window.appListerView || function () {
+        $('body').on('click', 'button.ul-line', function (e) {
+            e.preventDefault();
+            var $divLister = $(this).closest('div.ul-wrap');
+            //
+            $divLister.find('.list button').removeClass('active');
+            $(this).addClass('active');
+            //
+            $divLister.find('.list').fadeOut('fast', function () {
+                $divLister.find('.list').removeClass('ul-big').fadeIn();
+            });
+        });
+        $('body').on('click', 'button.ul-big', function (e) {
+            e.preventDefault();
+            var $divLister = $(this).closest('div.ul-wrap');
+            //
+            $divLister.find('.ul-buttons button').removeClass('active');
+            $(this).addClass('active');
+            //
+            $divLister.find('.list').fadeOut('fast', function () {
+                $divLister.find('.list').addClass('ul-big').fadeIn();
+            });
+        });
+    };
+    window.appListerView();
+    // Open an URL in POP: for social network sharing
+    window.appPopAnchor = window.appPopAnchor || function () {
+        $('body').on('click', '.a-pop', function (e) {
+            e.preventDefault();
+            window.open($(this).attr('href'), '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=400,width=700');
+            return false;
+        });
+    };
+    window.appPopAnchor();
+    // Notify new in Second Navbar
+    window.appNavbarNotify = window.appNavbarNotify || function () {
+        if($('.navbar-second .badge').length > 0) {
+            $('.navbar-main .account-notification').show();
+        }
+    };
+    window.appNavbarNotify();
+    // Cron Tasks
+    window.appCron = window.appCron || function () {
+        $('.app-snackbar .alert-success, .app-snackbar .alert-light').slideDown('slow', function () {
+            $(this).remove();
+        });
+        // Loop
+        setTimeout(window.appCron, 15000);
+    };
+    setTimeout(window.appCron, 20000); // $('body').delay(20000, window.appCron);
+    // Auto Submit Forms
+    window.appAutoSubmitForm = window.appAutoSubmitForm || function () {
+        if($('.auto-submit-form').length > 0) {
+            $('.auto-submit-form').submit();
+        }
+    };
+    window.appAutoSubmitForm();
+});
